@@ -19,9 +19,9 @@ public sealed class CollisionPool {
     private TaskSystem<Collision> pool = null;    // 大元のプール
     private TaskSystem<Collision> players = null; // 味方
     private TaskSystem<Collision> enemies = null; // 敵
-    private OrderHandler<Collision> playerOrderHandler = null; // 味方コリジョンの処理
-    private MatchHandler<Collision> scanOrderHandler = null;   // Hitしたかのチェック処理
-    private OrderHandler<Collision> hitOrderHandler = null;    // Hitした際の処理
+    private OrderHandler<Collision> playerHandler = null; // 味方コリジョンの処理
+    private MatchHandler<Collision> scanHandler = null;   // Hitしたかのチェック処理
+    private OrderHandler<Collision> hitHandler = null;    // Hitした際の処理
     private Collision ccol = null;  // チェックするコリジョン
     #endregion
 
@@ -36,11 +36,11 @@ public sealed class CollisionPool {
         this.enemies = new TaskSystem<Collision>(POOL_EN_MAX);
 
         // 味方検査
-        this.playerOrderHandler = new OrderHandler<Collision>(this.PlayerOrder);
+        this.playerHandler = new OrderHandler<Collision>(this.PlayerOrder);
         // 接触判定
-        this.scanOrderHandler = new MatchHandler<Collision>(this.ScanOrder);
+        this.scanHandler = new MatchHandler<Collision>(this.ScanOrder);
         // 接触処理
-        this.hitOrderHandler = new OrderHandler<Collision>(this.HitOrder);
+        this.hitHandler = new OrderHandler<Collision>(this.HitOrder);
 
         for (int i = 0; i < POOL_MAX; ++i) {
             this.collisions[i] = new Collision();
@@ -53,7 +53,7 @@ public sealed class CollisionPool {
     /// </summary>
     /// <param name="elapsedTime">経過時間</param>
     public void Proc(float elapsedTime) {
-        this.players.Order(this.playerOrderHandler); // 接触判定
+        this.players.Order(this.playerHandler); // 接触判定
     }
     #endregion
 
@@ -110,7 +110,7 @@ public sealed class CollisionPool {
     private bool PlayerOrder(Collision pcol, int no) {
         this.ccol = pcol;
         // 敵とのチェック
-        this.enemies.ParticularOrder(this.scanOrderHandler, this.hitOrderHandler);
+        this.enemies.ParticularOrder(this.scanHandler, this.hitHandler);
 
         if (!this.ccol.enable)
             this.pool.Attach(this.ccol);
